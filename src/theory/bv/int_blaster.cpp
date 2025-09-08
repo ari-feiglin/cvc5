@@ -1,7 +1,7 @@
 /******************************************************************************
  * Top contributors (to current version):
  *   Yoni Zohar, Aina Niemetz, Andrew Reynolds
- *
+ bvmul  (eo::to_bin m 1)*
  * This file is part of the cvc5 project.
  *
  * Copyright (c) 2009-2025 by the authors listed in the file AUTHORS
@@ -20,6 +20,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <iostream>
 
 #include "expr/node.h"
 #include "expr/node_algorithm.h"
@@ -73,7 +74,19 @@ std::shared_ptr<ProofNode> IntBlaster::getProofFor(Node fact)
 {
   // proofs not yet supported
   CDProof cdp(d_env);
-  cdp.addTrustedStep(fact, TrustId::INT_BLASTER, {}, {});
+
+  // begin new stuff
+  if (fact.getKind() == Kind::EQUAL) {
+    // step for equality between vector formula and intblasted formula
+    Assert(fact.getNumChildren() == 2);
+    cdp.addStep(fact, ProofRule::BV_INTBLAST, {}, {fact});
+  } else {
+    // otherwise step for lemma bounds
+    cdp.addStep(fact, ProofRule::BV_INTBLAST_BOUNDS, {}, {fact});
+  }
+  // end new stuff
+
+  //cdp.addTrustedStep(fact, TrustId::INT_BLASTER, {}, {});
   return cdp.getProofFor(fact);
 }
 
@@ -151,10 +164,10 @@ Node IntBlaster::makeBinary(Node n)
           || k == Kind::BITVECTOR_AND || k == Kind::BITVECTOR_OR
           || k == Kind::BITVECTOR_XOR || k == Kind::BITVECTOR_CONCAT))
   {
-    result = n[0];
-    for (uint32_t i = 1; i < numChildren; i++)
+    result = n[numChildren - 1];
+    for (uint32_t i = numChildren - 1; i > 0; i--)
     {
-      result = d_nm->mkNode(n.getKind(), result, n[i]);
+      result = d_nm->mkNode(n.getKind(), n[i - 1], result);
     }
   }
   d_binarizeCache[n] = result;
