@@ -1,7 +1,6 @@
 /******************************************************************************
  * Top contributors (to current version):
  *   Yoni Zohar, Aina Niemetz, Andrew Reynolds
- bvmul  (eo::to_bin m 1)*
  * This file is part of the cvc5 project.
  *
  * Copyright (c) 2009-2025 by the authors listed in the file AUTHORS
@@ -72,10 +71,8 @@ IntBlaster::~IntBlaster() {}
 
 std::shared_ptr<ProofNode> IntBlaster::getProofFor(Node fact)
 {
-  // proofs not yet supported
   CDProof cdp(d_env);
 
-  // begin new stuff
   if (fact.getKind() == Kind::EQUAL) {
     // step for equality between vector formula and intblasted formula
     Assert(fact.getNumChildren() == 2);
@@ -84,9 +81,7 @@ std::shared_ptr<ProofNode> IntBlaster::getProofFor(Node fact)
     // otherwise step for lemma bounds
     cdp.addStep(fact, ProofRule::BV_INTBLAST_BOUNDS, {}, {fact});
   }
-  // end new stuff
 
-  //cdp.addTrustedStep(fact, TrustId::INT_BLASTER, {}, {});
   return cdp.getProofFor(fact);
 }
 
