@@ -275,7 +275,7 @@
 ;;;;; ProofRule::BV_INTBLAST_BOUNDS
 
 ; rule: bv_intblast_bounds
-; implements: ProofRule::Bv_INTBLAST_BOUNDS
+; implements: ProofRule::BV_INTBLAST_BOUNDS
 ; args:
 ; - b Bool: the range constraint to check
 ; requires: that b is a correct range constraint.
