@@ -617,6 +617,33 @@ enum ENUM(ProofRule)
    * \endverbatim
    */
   EVALUE(MACRO_RESOLUTION_TRUST),
+  /**
+   * \verbatim embed:rst:leading-asterisk
+   * **Boolean -- Chain multiset resolution**
+   *
+   * This rule combines Resolution + Factoring + Reordering.
+   *
+   * .. math::
+   *   \inferrule{C_1 \dots C_n \mid C, (pol_1 \dots pol_{n-1}), (L_1 \dots L_{n-1})}{C}
+   *
+   * where
+   *
+   * - let :math:`C_1 \dots C_n` be nodes viewed as clauses, as defined in
+   *   :cpp:enumerator:`RESOLUTION <cvc5::ProofRule::RESOLUTION>`
+   * - let :math:`C_1 \diamond_{L,\mathit{pol}} C_2` represent the resolution of
+   *   :math:`C_1` with :math:`C_2` with pivot :math:`L` and polarity
+   *   :math:`pol`, as defined in
+   *   :cpp:enumerator:`RESOLUTION <cvc5::ProofRule::RESOLUTION>`
+   * - let :math:`C_1'` be equal, in its set representation, to :math:`C_1`,
+   * - for each :math:`i > 1`, let :math:`C_i'` be equal, in its set
+   *   representation, to :math:`C_{i-1} \diamond_{L_{i-1},\mathit{pol}_{i-1}}
+   *   C_i'`
+   *
+   * The result of the chain resolution is :math:`C`, which is equal, in its set
+   * representation, to :math:`C_n'`.
+   * \endverbatim
+   */
+  EVALUE(CHAIN_M_RESOLUTION),
 
   /**
    * \verbatim embed:rst:leading-asterisk
@@ -1141,6 +1168,7 @@ enum ENUM(ProofRule)
    * .. math::
    *
    *   \inferrule{-\mid t}{t = t}
+   *
    * \endverbatim
    */
   EVALUE(REFL),
@@ -1168,6 +1196,7 @@ enum ENUM(ProofRule)
    * .. math::
    *
    *   \inferrule{t_1=t_2,\dots,t_{n-1}=t_n\mid -}{t_1 = t_n}
+   *
    * \endverbatim
    */
   EVALUE(TRANS),
@@ -1215,6 +1244,7 @@ enum ENUM(ProofRule)
    * .. math::
    *
    *   \inferrule{F\mid -}{F = \top}
+   *
    * \endverbatim
    */
   EVALUE(TRUE_INTRO),
@@ -1225,6 +1255,7 @@ enum ENUM(ProofRule)
    * .. math::
    *
    *   \inferrule{F=\top\mid -}{F}
+   *
    * \endverbatim
    */
   EVALUE(TRUE_ELIM),
@@ -1235,6 +1266,7 @@ enum ENUM(ProofRule)
    * .. math::
    *
    *   \inferrule{\neg F\mid -}{F = \bot}
+   *
    * \endverbatim
    */
   EVALUE(FALSE_INTRO),
@@ -1245,6 +1277,7 @@ enum ENUM(ProofRule)
    * .. math::
    *
    *   \inferrule{F=\bot\mid -}{\neg F}
+   *
    * \endverbatim
    */
   EVALUE(FALSE_ELIM),
@@ -1291,6 +1324,7 @@ enum ENUM(ProofRule)
    *
    *   \inferrule{i_1 \neq i_2\mid \mathit{select}(\mathit{store}(a,i_1,e),i_2)}
    *   {\mathit{select}(\mathit{store}(a,i_1,e),i_2) = \mathit{select}(a,i_2)}
+   *
    * \endverbatim
    */
   EVALUE(ARRAYS_READ_OVER_WRITE),
@@ -1302,6 +1336,7 @@ enum ENUM(ProofRule)
    *
    *   \inferrule{\mathit{select}(\mathit{store}(a,i_2,e),i_1) \neq
    *   \mathit{select}(a,i_1)\mid -}{i_1=i_2}
+   *
    * \endverbatim
    */
   EVALUE(ARRAYS_READ_OVER_WRITE_CONTRA),
@@ -1313,6 +1348,7 @@ enum ENUM(ProofRule)
    *
    *   \inferrule{-\mid \mathit{select}(\mathit{store}(a,i,e),i)}
    *   {\mathit{select}(\mathit{store}(a,i,e),i)=e}
+   *
    * \endverbatim
    */
   EVALUE(ARRAYS_READ_OVER_WRITE_1),
@@ -1523,6 +1559,7 @@ enum ENUM(ProofRule)
    * .. math::
    *
    *   \inferrule{\mathit{set.singleton}(t) = \mathit{set.singleton}(s)\mid -}{t=s}
+   *
    * \endverbatim
    */
   EVALUE(SETS_SINGLETON_INJ),
@@ -1559,6 +1596,7 @@ enum ENUM(ProofRule)
    *
    *   \inferrule{\mathit{set.member}(x,\mathit{set.filter}(P, a))\mid -}
    *   {\mathit{set.member}(x,a) \wedge P(x)}
+   *
    * \endverbatim
    */
   EVALUE(SETS_FILTER_DOWN),
@@ -1756,6 +1794,7 @@ enum ENUM(ProofRule)
    *
    *   \inferrule{-\mid t}{(\mathit{len}(t) = 0\wedge t= \epsilon)\vee \mathit{len}(t)
    *   > 0}
+   *
    * \endverbatim
    */
   EVALUE(STRING_LENGTH_POS),
@@ -1766,6 +1805,7 @@ enum ENUM(ProofRule)
    * .. math::
    *
    *   \inferrule{t\neq \epsilon\mid -}{\mathit{len}(t) \neq 0}
+   *
    * \endverbatim
    */
   EVALUE(STRING_LENGTH_NON_EMPTY),
@@ -1808,6 +1848,7 @@ enum ENUM(ProofRule)
    * .. math::
    *
    *   \inferrule{t\in R_1,\,t\in R_2\mid -}{t\in \mathit{re.inter}(R_1,R_2)}
+   *
    * \endverbatim
    */
   EVALUE(RE_INTER),
@@ -1818,6 +1859,7 @@ enum ENUM(ProofRule)
    * .. math::
    *
    *   \inferrule{t_1\in R_1,\,\ldots,\,t_n\in R_n\mid -}{\text{str.++}(t_1, \ldots, t_n)\in \text{re.++}(R_1, \ldots, R_n)}
+   *
    * \endverbatim
    */
   EVALUE(RE_CONCAT),
@@ -1887,6 +1929,7 @@ enum ENUM(ProofRule)
    *
    *   \inferrule{-\mid t,s}{\mathit{to\_code}(t) = -1 \vee \mathit{to\_code}(t) \neq
    *   \mathit{to\_code}(s) \vee t = s}
+   *
    * \endverbatim
    */
   EVALUE(STRING_CODE_INJ),
@@ -2167,7 +2210,8 @@ enum ENUM(ProofRule)
    *
    * .. math::
    *
-   *   \inferrule{- \mid t}{(t < 0) \leftrightarrow (\exp(t) < 1)}
+   *   \inferrule{- \mid t}{(t < 0.0) \leftrightarrow (\exp(t) < 1.0)}
+   *
    * \endverbatim
    */
   EVALUE(ARITH_TRANS_EXP_NEG),
@@ -2177,7 +2221,8 @@ enum ENUM(ProofRule)
    *
    * .. math::
    *
-   *   \inferrule{- \mid t}{\exp(t) > 0}
+   *   \inferrule{- \mid t}{\exp(t) > 0.0}
+   *
    * \endverbatim
    */
   EVALUE(ARITH_TRANS_EXP_POSITIVITY),
@@ -2188,7 +2233,8 @@ enum ENUM(ProofRule)
    *
    * .. math::
    *
-   *   \inferrule{- \mid t}{t \leq 0 \lor \exp(t) > t+1}
+   *   \inferrule{- \mid t}{t \leq 0.0 \lor \exp(t) > t+1.0}
+   *
    * \endverbatim
    */
   EVALUE(ARITH_TRANS_EXP_SUPER_LIN),
@@ -2198,7 +2244,8 @@ enum ENUM(ProofRule)
    *
    * .. math::
    *
-   *   \inferrule{- \mid t}{(t=0) \leftrightarrow (\exp(t) = 1)}
+   *   \inferrule{- \mid t}{(t=0.0) \leftrightarrow (\exp(t) = 1.0)}
+   *
    * \endverbatim
    */
   EVALUE(ARITH_TRANS_EXP_ZERO),
@@ -2247,7 +2294,7 @@ enum ENUM(ProofRule)
    *
    * .. math::
    *
-   *   p^* := p(d-1) \cdot \frac{1 + t^n}{n!}
+   *   p^* := p(d-1) \cdot (\frac{1 - t^n}{n!})^{-1}
    *
    * :math:`\texttt{secant-pos}(\exp, l, u, t)` denotes the secant of :math:`p`
    * from :math:`(l, \exp(l))` to :math:`(u, \exp(u))` evaluated at :math:`t`,
@@ -2291,7 +2338,8 @@ enum ENUM(ProofRule)
    *
    * .. math::
    *
-   *   \inferrule{- \mid t}{\sin(t) \leq 1 \land \sin(t) \geq -1}
+   *   \inferrule{- \mid t}{\sin(t) \leq 1.0 \land \sin(t) \geq -1.0}
+   *
    * \endverbatim
    */
   EVALUE(ARITH_TRANS_SINE_BOUNDS),
@@ -2322,7 +2370,8 @@ enum ENUM(ProofRule)
    *
    * .. math::
    *
-   *   \inferrule{- \mid t}{\sin(t) - \sin(-t) = 0}
+   *   \inferrule{- \mid t}{\sin(t) + \sin(-t) = 0.0}
+   *
    * \endverbatim
    */
   EVALUE(ARITH_TRANS_SINE_SYMMETRY),
@@ -2332,8 +2381,10 @@ enum ENUM(ProofRule)
    *
    * .. math::
    *
-   *   \inferrule{- \mid t}{(t > 0 \rightarrow \sin(t) < t) \land (t < 0
-   *   \rightarrow \sin(t) > t)} \endverbatim
+   *   \inferrule{- \mid t}{(t > 0.0 \rightarrow \sin(t) < t) \land (t < 0.0
+   *   \rightarrow \sin(t) > t)}
+   *
+   * \endverbatim
    */
   EVALUE(ARITH_TRANS_SINE_TANGENT_ZERO),
   /**
@@ -2343,7 +2394,9 @@ enum ENUM(ProofRule)
    * .. math::
    *
    *   \inferrule{- \mid t}{(t > -\pi \rightarrow \sin(t) > -\pi - t) \land (t <
-   *   \pi \rightarrow \sin(t) < \pi - t)} \endverbatim
+   *   \pi \rightarrow \sin(t) < \pi - t)}
+   *
+   * \endverbatim
    */
   EVALUE(ARITH_TRANS_SINE_TANGENT_PI),
   /**
@@ -2486,7 +2539,6 @@ enum ENUM(ProofRule)
   EVALUE(LAST),
 #endif
 };
-// clang-format on
 
 #ifdef CVC5_API_USE_C_ENUMS
 #undef EVALUE
@@ -2810,6 +2862,7 @@ enum ENUM(ProofRewriteRule)
    *   \mathit{eqrange}(a,b,i,j)=
    *   \forall x.\> i \leq x \leq j \rightarrow
    *   \mathit{select}(a,x)=\mathit{select}(b,x)
+   *
    * \endverbatim
    */
   EVALUE(ARRAYS_EQ_RANGE_EXPAND),
@@ -2953,7 +3006,7 @@ enum ENUM(ProofRewriteRule)
   EVALUE(QUANT_DT_SPLIT),
   /**
    * \verbatim embed:rst:leading-asterisk
-   * **Quantifiers -- Macro datatype variable expand **
+   * **Quantifiers -- Macro datatype variable expand**
    *
    * .. math::
    *
@@ -3217,7 +3270,7 @@ enum ENUM(ProofRewriteRule)
   EVALUE(DT_MATCH_ELIM),
   /**
    * \verbatim embed:rst:leading-asterisk
-   * **Bitvectors -- Macro extract and concat **
+   * **Bitvectors -- Macro extract and concat**
    *
    * .. math::
    *
@@ -3231,7 +3284,7 @@ enum ENUM(ProofRewriteRule)
   EVALUE(MACRO_BV_EXTRACT_CONCAT),
   /**
    * \verbatim embed:rst:leading-asterisk
-   * **Bitvectors -- Macro or simplify **
+   * **Bitvectors -- Macro or simplify**
    *
    * .. math::
    *
@@ -3245,7 +3298,7 @@ enum ENUM(ProofRewriteRule)
   EVALUE(MACRO_BV_OR_SIMPLIFY),
   /**
    * \verbatim embed:rst:leading-asterisk
-   * **Bitvectors -- Macro and simplify **
+   * **Bitvectors -- Macro and simplify**
    *
    * .. math::
    *
@@ -3259,7 +3312,7 @@ enum ENUM(ProofRewriteRule)
   EVALUE(MACRO_BV_AND_SIMPLIFY),
   /**
    * \verbatim embed:rst:leading-asterisk
-   * **Bitvectors -- Macro xor simplify **
+   * **Bitvectors -- Macro xor simplify**
    *
    * .. math::
    *
@@ -3273,7 +3326,7 @@ enum ENUM(ProofRewriteRule)
   EVALUE(MACRO_BV_XOR_SIMPLIFY),
   /**
    * \verbatim embed:rst:leading-asterisk
-   * **Bitvectors -- Macro and/or/xor concat pullup **
+   * **Bitvectors -- Macro and/or/xor concat pullup**
    *
    * .. math::
    *
@@ -3287,7 +3340,7 @@ enum ENUM(ProofRewriteRule)
   EVALUE(MACRO_BV_AND_OR_XOR_CONCAT_PULLUP),
   /**
    * \verbatim embed:rst:leading-asterisk
-   * **Bitvectors -- Macro multiply signed less than multiply **
+   * **Bitvectors -- Macro multiply signed less than multiply**
    *
    * .. math::
    *
@@ -3301,7 +3354,7 @@ enum ENUM(ProofRewriteRule)
   EVALUE(MACRO_BV_MULT_SLT_MULT),
   /**
    * \verbatim embed:rst:leading-asterisk
-   * **Bitvectors -- Macro concat extract merge **
+   * **Bitvectors -- Macro concat extract merge**
    *
    * .. math::
    *
@@ -3315,7 +3368,7 @@ enum ENUM(ProofRewriteRule)
   EVALUE(MACRO_BV_CONCAT_EXTRACT_MERGE),
   /**
    * \verbatim embed:rst:leading-asterisk
-   * **Bitvectors -- Macro concat constant merge **
+   * **Bitvectors -- Macro concat constant merge**
    *
    * .. math::
    *
@@ -3710,6 +3763,17 @@ enum ENUM(ProofRewriteRule)
    * \endverbatim
    */
   EVALUE(RE_LOOP_ELIM),
+  /**
+   * \verbatim embed:rst:leading-asterisk
+   * **Strings -- regular expression equality elimination**
+   *
+   * .. math::
+   *
+   *   (R1 = R2) = \forall s.\> (\mathit{str.in_re}(s, R1) = \mathit{str.in_re}(s, R2))
+   *
+   * \endverbatim
+   */
+  EVALUE(RE_EQ_ELIM),
   /**
    * \verbatim embed:rst:leading-asterisk
    * **Strings -- regular expression intersection/union inclusion**
@@ -4600,6 +4664,8 @@ enum ENUM(ProofRewriteRule)
   EVALUE(RE_DIFF_ELIM),
   /** Auto-generated from RARE rule re-plus-elim */
   EVALUE(RE_PLUS_ELIM),
+  /** Auto-generated from RARE rule re-repeat-elim */
+  EVALUE(RE_REPEAT_ELIM),
   /** Auto-generated from RARE rule re-concat-star-swap */
   EVALUE(RE_CONCAT_STAR_SWAP),
   /** Auto-generated from RARE rule re-concat-star-repeat */
@@ -4742,6 +4808,7 @@ enum ENUM(ProofRewriteRule)
   EVALUE(LAST)
 #endif
 };
+// clang-format on
 
 #ifdef CVC5_API_USE_C_ENUMS
 #ifndef DOXYGEN_SKIP
