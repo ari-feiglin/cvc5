@@ -2,7 +2,7 @@
 
 (include "../programs/PolyNorm.eo")
 (include "../programs/Bitblasting.eo")
-(inlcude "../programs/Intblasting.eo")
+(include "../programs/Intblasting.eo")
 
 
 ;;;;; ProofRewriteRule::BV_REPEAT_ELIM

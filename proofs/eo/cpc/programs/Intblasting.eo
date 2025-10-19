@@ -1,4 +1,6 @@
 (include "../programs/BitVectors.eo")
+(include "../theories/ArithBvConv.eo")
+(include "../programs/Quantifiers.eo")
 
 ; define: $nosugar
 ; args:
@@ -271,8 +273,8 @@
     :signature (@List) (@Pair @List Bool)
     (
         (($intblast_variables_list @list.nil)       (@pair @list.nil true))
-        (($intblast_variables_list (@list x xs))    (eo::define ((recurse ($intblast_variables_list xs)))
-                                                            (@pair (eo::cons @list ($bound_var_rename x) ($pair_first recurse)) (eo::cons and ($get_range_constraint x) ($pair_second recurse)))
+        (($intblast_variables_list (@list x xs))    (eo::define ((variables_rest ($intblast_variables_list xs)))
+                                                            (@pair (eo::cons @list ($bound_var_rename x) ($pair_first variables_rest)) (eo::cons and ($get_range_constraint x) ($pair_second variables_rest)))
                                                     ))
     )
 )
