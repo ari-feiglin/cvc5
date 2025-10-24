@@ -77,6 +77,7 @@ std::shared_ptr<ProofNode> IntBlaster::getProofFor(Node fact)
     Assert(fact.getNumChildren() == 2);
     cdp.addStep(fact, ProofRule::BV_INTBLAST, {}, {fact});
   } else {
+    Assert(fact.getKind() == Kind::AND);
     // otherwise step for lemma bounds
     cdp.addStep(fact, ProofRule::BV_INTBLAST_BOUNDS, {}, {fact});
   }

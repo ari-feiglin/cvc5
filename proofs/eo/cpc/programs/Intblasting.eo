@@ -435,10 +435,12 @@
 ; lines 582 - 640
         (($intblast_C x)                         (eo::ite (eo::is_bin x)
                                                     (eo::to_z x)
-                                                (eo::ite (eo::is_bool x)
+                                                 (eo::ite (eo::is_bool x)
+                                                    x
+                                                 (eo::ite (eo::is_z x)
                                                     x
                                                     (_ @purify (ubv_to_int x))
-                                                )))
+                                                ))))
     )
 )
 
